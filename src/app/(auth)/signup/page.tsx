@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,35 +20,19 @@ export default function SignupPage() {
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
-    const supabase = createClient()
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName } },
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, fullName, username }),
     })
 
-    if (error) {
-      toast.error(error.message)
+    const data = await res.json()
+
+    if (!res.ok) {
+      toast.error(data.error || 'Something went wrong')
       setLoading(false)
       return
-    }
-
-    if (data.user) {
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: data.user.id,
-        full_name: fullName,
-        email,
-        username: username.toLowerCase().replace(/[^a-z0-9_]/g, ''),
-        is_approved: false,
-        is_published: false,
-      })
-
-      if (profileError) {
-        toast.error(profileError.message)
-        setLoading(false)
-        return
-      }
     }
 
     router.push('/pending')
