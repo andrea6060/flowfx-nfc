@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
-  LayoutDashboard, User, Link2, Palette, Eye, BarChart3, CreditCard, LogOut, Nfc
+  LayoutDashboard, User, Link2, Palette, Eye, BarChart3, CreditCard, LogOut, Nfc, ContactRound
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -13,6 +13,7 @@ const navItems = [
   { href: '/dashboard/profile', label: 'Profile', icon: User },
   { href: '/dashboard/links', label: 'Links', icon: Link2 },
   { href: '/dashboard/design', label: 'Design', icon: Palette },
+  { href: '/dashboard/vcard', label: 'vCard', icon: ContactRound },
   { href: '/dashboard/preview', label: 'Preview', icon: Eye },
   { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },

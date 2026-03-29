@@ -3,9 +3,34 @@ import { notFound } from 'next/navigation'
 import { BACKGROUNDS, FONTS } from '@/lib/constants'
 import { Mail, Phone, Globe, ExternalLink } from 'lucide-react'
 import AnalyticsTracker from './analytics-tracker'
+import type { CSSProperties } from 'react'
 
 interface PageProps {
   params: Promise<{ username: string }>
+}
+
+function getButtonStyle(design: Record<string, unknown> | null): CSSProperties {
+  const primary = (design?.color_primary as string) || '#0ea5e9'
+  const accent = (design?.color_accent as string) || '#a855f7'
+  const style = (design?.button_style as string) || 'solid'
+  const radiusMap: Record<string, string> = { square: '0', soft: '12px', pill: '9999px' }
+  const radius = radiusMap[(design?.button_radius as string) || 'pill'] || '9999px'
+  const thickness = (design?.button_border_thickness as number) || 2
+
+  if (style === 'outline') {
+    return { borderRadius: radius, backgroundColor: 'transparent', color: primary, border: `${thickness}px solid ${primary}` }
+  }
+  if (style === 'soft') {
+    return { borderRadius: radius, backgroundColor: primary + '30', color: primary }
+  }
+  if (style === 'gradient') {
+    const dir = (design?.button_gradient_direction as string) || 'to-right'
+    const dirMap: Record<string, string> = { 'to-right': '90deg', 'to-bottom': '180deg', 'diagonal': '135deg' }
+    const angle = dirMap[dir] || '90deg'
+    return { borderRadius: radius, background: `linear-gradient(${angle}, ${primary}, ${accent})`, color: '#fff' }
+  }
+  // solid (default)
+  return { borderRadius: radius, backgroundColor: primary, color: '#fff' }
 }
 
 export default async function ProfilePage({ params }: PageProps) {
@@ -37,6 +62,7 @@ export default async function ProfilePage({ params }: PageProps) {
   const bg = BACKGROUNDS.find((b) => b.id === design?.background_id) || BACKGROUNDS[0]
   const font = FONTS.find((f) => f.id === design?.font_id) || FONTS[0]
   const primaryColor = design?.color_primary || '#0ea5e9'
+  const buttonStyle = getButtonStyle(design as Record<string, unknown> | null)
 
   return (
     <div className={`min-h-screen ${bg.className} flex items-start justify-center py-10 px-4`}
@@ -107,8 +133,8 @@ export default async function ProfilePage({ params }: PageProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-link-id={link.id}
-                className="link-btn flex items-center justify-between w-full px-5 py-4 rounded-xl text-white font-medium text-sm transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] shadow-lg"
-                style={{ backgroundColor: primaryColor }}
+                className="link-btn flex items-center justify-between w-full px-5 py-4 font-medium text-sm transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                style={buttonStyle}
               >
                 <span>{link.label}</span>
                 <ExternalLink className="w-4 h-4 opacity-70" />
