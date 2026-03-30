@@ -7,6 +7,7 @@ import type { CSSProperties } from 'react'
 
 interface PageProps {
   params: Promise<{ username: string }>
+  searchParams: Promise<{ preview?: string }>
 }
 
 function getButtonStyle(design: Record<string, unknown> | null): CSSProperties {
@@ -33,16 +34,22 @@ function getButtonStyle(design: Record<string, unknown> | null): CSSProperties {
   return { borderRadius: radius, backgroundColor: primary, color: '#fff' }
 }
 
-export default async function ProfilePage({ params }: PageProps) {
+export default async function ProfilePage({ params, searchParams }: PageProps) {
   const { username } = await params
+  const { preview } = await searchParams
   const supabase = await createClient()
 
-  const { data: profile } = await supabase
+  const query = supabase
     .from('profiles')
     .select('*')
     .eq('username', username)
-    .eq('is_published', true)
-    .single()
+
+  // Allow preview mode to bypass published check
+  if (!preview) {
+    query.eq('is_published', true)
+  }
+
+  const { data: profile } = await query.single()
 
   if (!profile) notFound()
 

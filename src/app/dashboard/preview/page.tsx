@@ -6,7 +6,7 @@ export default async function PreviewPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('username')
+    .select('username, is_published')
     .eq('id', user!.id)
     .single()
 
@@ -23,7 +23,7 @@ export default async function PreviewPage() {
             {/* Notch */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-7 bg-zinc-950 rounded-b-2xl z-10" />
             <iframe
-              src={`/u/${profile?.username}`}
+              src={`/u/${profile?.username}?preview=true`}
               className="w-full h-[720px]"
               title="Profile Preview"
             />
